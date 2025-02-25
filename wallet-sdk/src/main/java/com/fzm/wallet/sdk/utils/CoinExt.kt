@@ -12,7 +12,7 @@ inline val Coin.totalAsset: Double get() = rmb * balance.toDouble()
 
 inline val Coin.isBty: Boolean get() = chain == "BTY"
 
-inline val Coin.isBtyChild: Boolean get() = isBty && platform != "bty"
+inline val Coin.isBtyChild: Boolean get() = isBty && platform != "bty" && platform != "ethereum"
 
 inline val Coin.isBtyCoins: Boolean get() = isBtyChild && isCoin
 

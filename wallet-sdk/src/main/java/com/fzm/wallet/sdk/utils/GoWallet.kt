@@ -446,7 +446,7 @@ class GoWallet {
          * @return String?
          */
         fun sendTran(chain: String, signData: String, tokenSymbol: String): String? {
-            return sendTran(chain, signData, tokenSymbol, UrlConfig.GO_URL!!)
+            return sendTran(chain, signData, tokenSymbol, UrlConfig.GO_URL)
         }
 
         /**
