@@ -167,6 +167,70 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         gsendTx.fee = withHold.btyFee * 3
     }
 
+    private fun isETHPara(cointype: String?, platform: String?): Boolean {
+        return cointype == "ETH" && platform != "ethereum" && platform != "ycceth"
+    }
+
+    private fun isBTYPara(cointype: String?, platform: String?): Boolean {
+        return cointype == "BTY" && platform != "bty"
+    }
+
+    class CoinToken {
+        var cointype: String = ""
+        var tokenSymbol: String = ""
+
+        //是否要代扣,默认不代扣
+        var proxy: Boolean = false
+        var exer: String = ""
+    }
+
+    //1、token
+    //2、coins
+    fun newCoinType(
+        cointype: String,
+        name: String,
+        platform: String?,
+        treaty: String?
+    ): CoinToken {
+        val coinToken = CoinToken()
+        coinToken.cointype = cointype
+        coinToken.tokenSymbol = if (cointype == name) "" else name
+        //默认都是不代扣的
+        coinToken.proxy = false
+        if (platform == null) {
+            return coinToken
+        }
+        when (name) {
+            Walletapi.TypeBtyString -> {
+                if (platform != "bnb") {
+                    coinToken.cointype = Walletapi.TypeBtyString
+                    coinToken.tokenSymbol = ""
+                }
+            }
+
+            Walletapi.TypeYccString -> {
+                if (platform == "btc" || platform == "bty" || platform == "ethereum") {
+                    coinToken.cointype = Walletapi.TypeYccString
+                    coinToken.tokenSymbol = ""
+                }
+            }
+        }
+        if (isETHPara(cointype, platform) || isBTYPara(cointype, platform)) {
+            coinToken.proxy = true
+            if (treaty == "1") {
+                coinToken.cointype = Walletapi.TypeBtyString
+                coinToken.tokenSymbol = "$platform.$name"
+                coinToken.exer = "user.p.$platform.token"
+            } else if (treaty == "2") {
+                coinToken.cointype = Walletapi.TypeBtyString
+                coinToken.tokenSymbol = "$platform.coins"
+                coinToken.exer = "user.p.$platform.coins"
+            }
+        }
+
+        return coinToken
+    }
+
     private fun handleTransfer(
         coin: Coin,
         toAddress: String,
@@ -175,10 +239,11 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         note: String?,
         privateKey: String,
     ): String {
-        val tokenSymbol = coin.tokenSymbol
+        val coinToken = newCoinType(coin.chain,coin.name,coin.platform,coin.treaty)
+        val tokenSymbol = coinToken.tokenSymbol
         // 构造交易
         val rawTx = GoWallet.createTran(
-            coin.chain,
+            coinToken.cointype,
             coin.address,
             toAddress,
             amount,
@@ -192,11 +257,11 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         }
 
         // 签名交易
-        val signTx = GoWallet.signTran(coin.chain, createRawResult.result ?: "", privateKey)
+        val signTx = GoWallet.signTran(coinToken.cointype, createRawResult.result ?: "", privateKey)
             ?: throw Exception("签名交易失败")
 
         // 发送交易
-        val sendTx = GoWallet.sendTran(coin.chain, signTx, tokenSymbol)
+        val sendTx = GoWallet.sendTran(coinToken.cointype, signTx, tokenSymbol)
         val sendResult = gson.fromJson(sendTx, StringResult::class.java)
         val txId = sendResult.result
         if (sendResult == null) {
