@@ -40,6 +40,15 @@ android {
     }
 }
 
+// 打包源码 AAR
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+artifacts {
+    archives sourcesJar
+}
+
 repositories {
     flatDir {
         dirs 'libs'
