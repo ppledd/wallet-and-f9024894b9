@@ -110,13 +110,8 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 throw Exception("密码输入错误")
             }
             val mnem = MnemonicManager.getMnemonicWords(password)
-            val privateKey = coin.getPrivkey(coin.chain, mnem)?: throw Exception("私钥获取失败")
-
-            if (coin.isBtyChild) {
-                handleBtyChildTransfer(coin, toAddress, amount, fee, note, privateKey)
-            } else {
-                handleTransfer(coin, toAddress, amount, fee, note, privateKey)
-            }
+            val privateKey = coin.getPrivkey(coin.chain, mnem) ?: throw Exception("私钥获取失败")
+            handleTransfer(coin, toAddress, amount, fee, note, privateKey)
         }
     }
 
@@ -166,7 +161,6 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         //代扣的就是平行链的token和coins，统一都x3
         gsendTx.fee = withHold.btyFee * 3
     }
-
 
 
     private fun handleTransfer(
@@ -432,13 +426,15 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             }
             if (data.isNullOrEmpty()) {
                 val local = MMkvUtil.decodeString(getKey(coin, type))
-                return@withContext gson.fromJson(local, TransactionResponse::class.java).result ?: emptyList()
+                return@withContext gson.fromJson(local, TransactionResponse::class.java).result
+                    ?: emptyList()
             }
             if (index == 0L) {
                 // 缓存第一页数据
                 MMkvUtil.encode(getKey(coin, type), data)
             }
-            return@withContext gson.fromJson(data, TransactionResponse::class.java).result ?: emptyList()
+            return@withContext gson.fromJson(data, TransactionResponse::class.java).result
+                ?: emptyList()
         }
     }
 
