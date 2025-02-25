@@ -12,6 +12,7 @@ import com.fzm.wallet.sdk.BWallet
 import com.fzm.wallet.sdk.WalletConfiguration
 import com.fzm.wallet.sdk.db.entity.PWallet
 import com.fzm.wallet.sdk.exception.ImportWalletException
+import com.fzm.walletmodule.BuildConfig
 import com.fzm.walletmodule.R
 import com.fzm.walletmodule.base.Constants
 import com.fzm.walletmodule.event.CaptureEvent
@@ -53,6 +54,10 @@ class ImportWalletActivity : BaseActivity() {
         val count = LitePal.count<PWallet>()
         val name = getString(R.string.import_wallet_wallet_name) + (count + 1)
         walletName.setText(name)
+        if (BuildConfig.DEBUG) {
+            walletPassword.setText("12345678a")
+            walletPasswordAgain.setText("12345678a")
+        }
         et_mnem.setRegex(LimitEditText.REGEX_CHINESE_ENGLISH)
     }
 
@@ -150,7 +155,10 @@ class ImportWalletActivity : BaseActivity() {
                         val pWallet = wallet.findWallet(id)
                         dismiss()
                         EventBus.getDefault().postSticky(MyWalletEvent(pWallet))
-                        ToastUtils.show(this@ImportWalletActivity, getString(R.string.my_import_success))
+                        ToastUtils.show(
+                            this@ImportWalletActivity,
+                            getString(R.string.my_import_success)
+                        )
                         closeSomeActivitys()
                         finish()
                     } catch (e: ImportWalletException) {

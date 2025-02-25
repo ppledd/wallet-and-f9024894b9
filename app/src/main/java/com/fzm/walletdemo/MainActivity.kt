@@ -48,50 +48,35 @@ class MainActivity : BaseActivity() {
             }
         }
     }
-
-
-    val DEFAULT_COINS = listOf(
+    private val DEFAULT_COINS = listOf(
         Coin().apply {
-            name = "USDT"
-            chain = "BNB"
-            platform = "bnb"
-            netId = "694"
-        }, Coin().apply {
-            name = "BTY"
-            chain = "BTY"
-            platform = "bty"
-            netId = "154"
-        }, Coin().apply {
-            name = "YCC"
-            chain = "BNB"
-            platform = "bnb"
-            netId = "695"
-        }, Coin().apply {
-            name = "BNB"
-            chain = "BNB"
-            platform = "bnb"
-            netId = "641"
-        }, Coin().apply {
-            name = "TRX"
-            chain = "TRX"
-            platform = "trx"
-            netId = "1"
-        }, Coin().apply {
-            name = "USDT"
-            chain = "TRX"
-            platform = "trx"
-            netId = "600"
-        }, Coin().apply {
-            name = "ETH"
             chain = "ETH"
-            platform = "ethereum"
+            name = "ETH"
             netId = "90"
-        }, Coin().apply {
+            platform = "ethereum"
+            treaty = "1"
+        },
+        Coin().apply {
+            chain = "ETH"
             name = "BTY"
+            netId = "732"
+            platform = "ethereum"
+            treaty = "1"
+        },
+        Coin().apply {
             chain = "BNB"
+            name = "USDT"
+            netId = "694"
             platform = "bnb"
-            netId = "705"
-        }
+            treaty = "1"
+        },
+        Coin().apply {
+            chain = "BNB"
+            name = "BNB"
+            netId = "641"
+            platform = "bnb"
+            treaty = "1"
+        },
     )
 
     override fun initView() {
