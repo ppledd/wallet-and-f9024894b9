@@ -162,6 +162,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         gsendTx.fee = withHold.btyFee * 3
     }
 
+    private var addressId = 0
 
     private fun handleTransfer(
         coin: Coin,
@@ -183,14 +184,18 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             note ?: "",
             tokenSymbol
         )
-        val createRawResult = JSON.parseObject(rawTx, StringResult::class.java)
-        if (createRawResult?.result == null) {
-            throw Exception("创建交易失败")
-        }
+        val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
+        val createRawResult: String = stringResult.result ?: ""
 
-        // 签名交易
-        val signTx = GoWallet.signTran(coinToken.cointype, createRawResult.result ?: "", privateKey)
-            ?: throw Exception("签名交易失败")
+        //签名交易
+        addressId = if (coin.name == "BTY" && coin.chain == "ETH") {
+            2
+        } else {
+            0
+        }
+        val signTx = GoWallet.signTran(
+            coinToken.cointype, Walletapi.stringTobyte(createRawResult), privateKey, addressId
+        ) ?: throw Exception("签名交易失败")
 
         // 发送交易
         val sendTx = GoWallet.sendTran(coinToken.cointype, signTx, tokenSymbol)

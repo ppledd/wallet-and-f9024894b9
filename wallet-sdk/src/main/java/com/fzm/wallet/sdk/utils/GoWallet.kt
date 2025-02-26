@@ -397,8 +397,12 @@ class GoWallet {
          */
         fun signTran(chain: String, unSignData: String, priv: String): String? {
             try {
+                val signData = SignData()
+                signData.cointype = chain
+                signData.data = Walletapi.stringTobyte(unSignData)
+                signData.privKey = priv
                 val signRawTransaction =
-                    Walletapi.signRawTransaction(chain, Walletapi.stringTobyte(unSignData), priv)
+                    Walletapi.signRawTransaction(signData)
                 Log.v("tag", "签名交易: $signRawTransaction")
                 return signRawTransaction
             } catch (e: java.lang.Exception) {
@@ -406,6 +410,28 @@ class GoWallet {
             }
             return null
         }
+
+        //unSignData只有dapp签名（16进制）的时候才是hexTobyte，普通转账是stringTobyte
+        fun signTran(chain: String, unSignData: ByteArray, priv: String, addressId: Int): String? {
+            try {
+                val signData = SignData()
+                signData.cointype = chain
+                signData.data = unSignData
+                signData.privKey = priv
+                if (addressId != -1) {
+                    signData.addressID = addressId
+                }
+                val signRawTransaction =
+                    Walletapi.signRawTransaction(signData)
+                Log.v("tag", "签名交易: $signRawTransaction")
+                return signRawTransaction
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+                Log.e("error", "$e")
+            }
+            return null
+        }
+
 
         /**
          * 发送交易
