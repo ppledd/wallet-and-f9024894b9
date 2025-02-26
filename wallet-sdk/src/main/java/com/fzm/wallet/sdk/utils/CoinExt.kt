@@ -67,3 +67,5 @@ inline val Coin.fullExec: String get() = if (isCoin) "$fullChain.coins" else "$f
  * 红包等需要的执行器
  */
 inline val Coin.assetExec: String get() = if (isCoin) "coins" else "token"
+
+const val BTY_ETH_NODE = "https://mainnet.bityuan.com/eth"

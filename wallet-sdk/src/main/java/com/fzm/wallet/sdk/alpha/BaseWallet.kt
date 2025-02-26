@@ -419,11 +419,10 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     ): List<Transactions> {
         return withContext(Dispatchers.IO) {
             var coinName = coin.name
-            if (GoWallet.isBTYChild(coin)) {
-                coinName =
-                    if (coin.treaty == "1") "${coin.platform}.${coin.name}" else "${coin.platform}.coins"
+            if(coin.name == "BTY" && coin.chain == "ETH"){
+                coin.chain = "BTY"
+                coin.platform = "bty"
             }
-
             val data = if (index == 0L) {
                 GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
             } else {

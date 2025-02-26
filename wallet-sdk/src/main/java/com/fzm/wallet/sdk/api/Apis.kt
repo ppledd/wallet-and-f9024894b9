@@ -10,6 +10,7 @@ import com.fzm.wallet.sdk.net.GoResponse
 import com.fzm.wallet.sdk.net.HttpResponse
 import com.fzm.wallet.sdk.net.UrlConfig.DOMAIN_EXCHANGE_DO
 import com.fzm.wallet.sdk.net.UrlConfig.DOMAIN_EXCHANGE_MANAGER
+import com.fzm.wallet.sdk.utils.BTY_ETH_NODE
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager.DOMAIN_NAME_HEADER
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -34,7 +35,7 @@ interface Apis {
     suspend fun getBrowserUrl(@Query("platform") platform: String): HttpResponse<BrowserBean>
 
 
-    @POST("interface/wallet-coin")
+    @POST("v2api/interface/wallet-coin")
     suspend fun getCoinList(@Body body: Map<String, Any>): HttpResponse<List<Coin>>
 
     @POST("interface/wallet-coin/search")
@@ -78,4 +79,12 @@ interface Apis {
         @Query("cointype") cointype: String,
         @Query("tokensymbol") tokensymbol: String
     ): HttpResponse<ExchangeFee>
+
+
+    @POST(BTY_ETH_NODE)
+    suspend fun getTransactionCount(@Body body: RequestBody): GoResponse<String>
+    @POST(BTY_ETH_NODE)
+    suspend fun getGasPrice(@Body body: RequestBody): GoResponse<String>
+    @POST(BTY_ETH_NODE)
+    suspend fun sendRawTransaction(@Body body: RequestBody): GoResponse<String>
 }
