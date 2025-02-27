@@ -24,6 +24,11 @@ allprojects {
         mavenCentral()
         maven { url "https://jitpack.io" }
 
+        flatDir {
+            dirs 'libs'
+            dirs project(':wallet-sdk').file('libs')
+        }
+
     }
 }
 
