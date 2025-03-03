@@ -35,7 +35,7 @@ interface Apis {
     suspend fun getBrowserUrl(@Query("platform") platform: String): HttpResponse<BrowserBean>
 
 
-    @POST("v2api/interface/wallet-coin")
+    @POST("interface/wallet-coin")
     suspend fun getCoinList(@Body body: Map<String, Any>): HttpResponse<List<Coin>>
 
     @POST("interface/wallet-coin/search")
