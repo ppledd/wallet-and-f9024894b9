@@ -208,7 +208,8 @@ class GoWallet {
                     tokenSymbol = symbol
                     util = getUtil(UrlConfig.GO_URL)
                     extendInfo = ExtendInfo().apply {
-                        execer = if (coin.isBtyChild) "user.p.${coin.platform}.redpacket" else "redpacket"
+                        execer =
+                            if (coin.isBtyChild) "user.p.${coin.platform}.redpacket" else "redpacket"
                         assetExec = coin.assetExec
                         assetSymbol = coin.name
                     }
@@ -384,7 +385,16 @@ class GoWallet {
             chain: String, fromAddr: String, toAddr: String, amount: Double, fee: Double,
             note: String, tokensymbol: String
         ): String? {
-            return createTran(chain, fromAddr, toAddr, amount, fee, note, tokensymbol, UrlConfig.GO_URL!!)
+            return createTran(
+                chain,
+                fromAddr,
+                toAddr,
+                amount,
+                fee,
+                note,
+                tokensymbol,
+                UrlConfig.GO_URL!!
+            )
         }
 
 
@@ -631,7 +641,8 @@ class GoWallet {
         internal suspend fun createWallet(wallet: PWallet, coinList: List<Coin>): PWallet {
             return withContext(Dispatchers.IO) {
                 coinList.forEachIndexed { index, coin ->
-                    val hdWallet = getHDWallet(coin.chain, wallet.mnem)
+                    val goChain = if (coin.chain == "BNB") "ETH" else coin.chain
+                    val hdWallet = getHDWallet(goChain, wallet.mnem)
                     val pubkey = hdWallet!!.newKeyPub(0)
                     val address = hdWallet.newAddress_v2(0)
                     val pubkeyStr = encodeToStrings(pubkey)
@@ -639,10 +650,6 @@ class GoWallet {
                     coin.status = Coin.STATUS_ENABLE
                     coin.pubkey = pubkeyStr
                     coin.address = address
-                    if (Walletapi.TypeBtyString == coin.chain) {
-                        val bWalletImpl = BWallet.get() as BWalletImpl
-                        bWalletImpl.setBtyPrivkey(encodeToStrings(hdWallet.newKeyPriv(0)))
-                    }
                 }
                 saveAll(coinList)
                 wallet.coinList.addAll(coinList)
@@ -727,15 +734,12 @@ class GoWallet {
         }
 
 
-
     }
 
 
     interface CoinListener {
         fun onSuccess()
     }
-
-
 
 
 }
