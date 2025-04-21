@@ -220,11 +220,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     ): String {
 
         //签名交易
-        addressId = if (coin.name == "BTY" && coin.chain == "ETH") {
-            2
-        } else {
-            0
-        }
+        addressId = if (coin.address.startsWith("0x")) 2 else 0
         val signTx = GoWallet.signTran(
             coinToken.cointype, Walletapi.stringTobyte(createRawResult), privateKey, addressId
         ) ?: throw Exception("签名交易失败")
