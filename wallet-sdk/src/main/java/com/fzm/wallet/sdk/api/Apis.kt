@@ -6,10 +6,13 @@ import com.fzm.wallet.sdk.bean.Miner
 import com.fzm.wallet.sdk.bean.WithHold
 import com.fzm.wallet.sdk.db.entity.AddCoinTabBean
 import com.fzm.wallet.sdk.db.entity.Coin
+import com.fzm.wallet.sdk.db.entity.ContractBalance
+import com.fzm.wallet.sdk.db.entity.CreateRaw
 import com.fzm.wallet.sdk.net.GoResponse
 import com.fzm.wallet.sdk.net.HttpResponse
 import com.fzm.wallet.sdk.net.UrlConfig.DOMAIN_EXCHANGE_DO
 import com.fzm.wallet.sdk.net.UrlConfig.DOMAIN_EXCHANGE_MANAGER
+import com.fzm.wallet.sdk.net.UrlConfig.DOMAIN_URL_GO
 import com.fzm.wallet.sdk.utils.BTY_ETH_NODE
 import me.jessyan.retrofiturlmanager.RetrofitUrlManager.DOMAIN_NAME_HEADER
 import okhttp3.RequestBody
@@ -87,4 +90,13 @@ interface Apis {
     suspend fun getGasPrice(@Body body: RequestBody): GoResponse<String>
     @POST(BTY_ETH_NODE)
     suspend fun sendRawTransaction(@Body body: RequestBody): GoResponse<String>
+
+
+
+    @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
+    @POST("/")
+    suspend fun getBalanceByContract(@Body body: RequestBody): GoResponse<ContractBalance>
+    @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
+    @POST("/")
+    suspend fun CreateByContract(@Body body: RequestBody): GoResponse<CreateRaw>
 }

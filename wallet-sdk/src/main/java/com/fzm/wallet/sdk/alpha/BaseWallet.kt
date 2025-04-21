@@ -164,7 +164,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
 
     private var addressId = 0
 
-    private fun handleTransfer(
+    private suspend fun handleTransfer(
         coin: Coin,
         toAddress: String,
         amount: Double,
@@ -175,17 +175,49 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         val coinToken = coin.newChain
         val tokenSymbol = coinToken.tokenSymbol
         // 构造交易
-        val rawTx = GoWallet.createTran(
-            coinToken.cointype,
-            coin.address,
-            toAddress,
-            amount,
-            fee,
-            note ?: "",
-            tokenSymbol
-        )
-        val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
-        val createRawResult: String = stringResult.result ?: ""
+
+
+        if (coin.contractAddress.isNotEmpty()) {
+            val result = walletRepository.createByContract(
+                coinToken.cointype,
+                tokenSymbol,
+                coin.address,
+                toAddress,
+                amount,
+                fee,
+                coin.contractAddress
+            )
+            if (result.isSucceed()) {
+                val createResult = result.data()
+                val createJson = gson.toJson(createResult)
+                return signAndSends(coin, tokenSymbol, coinToken, privateKey, createJson)
+            }
+        } else {
+            val rawTx = GoWallet.createTran(
+                coinToken.cointype,
+                coin.address,
+                toAddress,
+                amount,
+                fee,
+                note ?: "",
+                tokenSymbol
+            )
+            val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
+            val createRawResult: String = stringResult.result ?: ""
+            return signAndSends(coin, tokenSymbol, coinToken, privateKey, createRawResult)
+        }
+        return ""
+
+    }
+
+
+    fun signAndSends(
+        coin: Coin,
+        tokenSymbol: String,
+        coinToken: GoWallet.Companion.CoinToken,
+        privateKey: String,
+        createRawResult: String
+    ): String {
 
         //签名交易
         addressId = if (coin.name == "BTY" && coin.chain == "ETH") {
@@ -328,11 +360,26 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             for (coin in coins) {
                 deferred.add(async(Dispatchers.IO) {
                     try {
-                        coin.balance = GoWallet.handleBalance(coin)
-                        updateLocalCoin(
-                            ContentValues().apply { put("balance", coin.balance) },
-                            coin.id
-                        )
+                        if (coin.contractAddress.isNotEmpty()) {
+                            val result = walletRepository.getBalanceByContract(
+                                coin.chain,
+                                coin.address,
+                                coin.contractAddress
+                            )
+                            if (result.isSucceed()) {
+                                coin.balance = result.data()?.balance
+                                updateLocalCoin(
+                                    ContentValues().apply { put("balance", coin.balance) },
+                                    coin.id
+                                )
+                            }
+                        } else {
+                            coin.balance = GoWallet.handleBalance(coin)
+                            updateLocalCoin(
+                                ContentValues().apply { put("balance", coin.balance) },
+                                coin.id
+                            )
+                        }
                         return@async
                     } catch (e: Exception) {
                         // 资产获取异常
@@ -419,7 +466,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     ): List<Transactions> {
         return withContext(Dispatchers.IO) {
             var coinName = coin.name
-            if(coin.name == "BTY" && coin.chain == "ETH"){
+            if (coin.name == "BTY" && coin.chain == "ETH") {
                 coin.chain = "BTY"
                 coin.platform = "bty"
             }

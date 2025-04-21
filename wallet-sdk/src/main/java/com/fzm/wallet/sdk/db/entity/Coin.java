@@ -39,6 +39,8 @@ public class Coin extends BaseBean implements Comparable<Coin>{
     private String address;
     private String icon;
     private String name;
+    //合约地址
+    private String contractAddress;
     private String nickname;
     private String platform;
     private String chain;
@@ -54,6 +56,14 @@ public class Coin extends BaseBean implements Comparable<Coin>{
     @SerializedName("id")
     private String netId;
     private int sort;
+
+    public String getContractAddress() {
+        return contractAddress;
+    }
+
+    public void setContractAddress(String contractAddress) {
+        this.contractAddress = contractAddress;
+    }
 
     public int getSort() {
         return sort;
