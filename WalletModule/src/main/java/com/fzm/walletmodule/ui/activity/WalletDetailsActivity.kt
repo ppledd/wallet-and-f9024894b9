@@ -274,7 +274,7 @@ class WalletDetailsActivity : BaseActivity() {
                             val coin = coinList[position]
                             WalletManager().exportPriv(
                                 this@WalletDetailsActivity,
-                                coin.getPrivkey(coin.chain, mnem)
+                                coin.getPrivkey(if (coin.chain == "BNB") "ETH" else coin.chain, mnem)
                             )
                         }
                     }

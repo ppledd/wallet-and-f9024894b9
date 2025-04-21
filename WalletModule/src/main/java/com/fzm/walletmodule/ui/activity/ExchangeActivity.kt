@@ -310,7 +310,7 @@ class ExchangeActivity : BaseActivity() {
 
     private fun configTransaction(password: String) {
         val mnem = GoWallet.decMenm(GoWallet.encPasswd(password)!!, mCoin.getpWallet().mnem)
-        val priv = mCoin.getPrivkey(mCoin.chain, mnem)
+        val priv = mCoin.getPrivkey(if (mCoin.chain == "BNB") "ETH" else mCoin.chain, mnem)
         handleTransactions(priv)
 
     }
