@@ -3,6 +3,7 @@ package com.fzm.wallet.sdk.api
 import com.fzm.wallet.sdk.bean.BrowserBean
 import com.fzm.wallet.sdk.bean.ExchangeFee
 import com.fzm.wallet.sdk.bean.Miner
+import com.fzm.wallet.sdk.bean.Transactions
 import com.fzm.wallet.sdk.bean.WithHold
 import com.fzm.wallet.sdk.db.entity.AddCoinTabBean
 import com.fzm.wallet.sdk.db.entity.Coin
@@ -99,4 +100,7 @@ interface Apis {
     @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
     @POST("/")
     suspend fun CreateByContract(@Body body: RequestBody): GoResponse<CreateRaw>
+    @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
+    @POST("/")
+    suspend fun queryTransactionsByaddress(@Body body: RequestBody): GoResponse<List<Transactions>>
 }

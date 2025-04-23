@@ -467,22 +467,23 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 coin.chain = "BTY"
                 coin.platform = "bty"
             }
-            val data = if (index == 0L) {
-                GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
+
+            if (coin.contractAddress.isEmpty()) {
+                // 处理 GoWallet 同步调用
+                val jsonData = GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
+                val response = gson.fromJson(jsonData, TransactionResponse::class.java)
+                response.result ?: emptyList()
             } else {
-                GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
+                // 处理 Repository 异步调用
+                val res = walletRepository.queryTransactionsByaddress(
+                    coin.chain, "", coin.address, coin.contractAddress, index, size, 0, type
+                )
+                if (res.isSucceed()) {
+                    res.data() ?: emptyList()
+                } else {
+                    emptyList() // 或抛出自定义异常
+                }
             }
-            if (data.isNullOrEmpty()) {
-                val local = MMkvUtil.decodeString(getKey(coin, type))
-                return@withContext gson.fromJson(local, TransactionResponse::class.java).result
-                    ?: emptyList()
-            }
-            if (index == 0L) {
-                // 缓存第一页数据
-                MMkvUtil.encode(getKey(coin, type), data)
-            }
-            return@withContext gson.fromJson(data, TransactionResponse::class.java).result
-                ?: emptyList()
         }
     }
 

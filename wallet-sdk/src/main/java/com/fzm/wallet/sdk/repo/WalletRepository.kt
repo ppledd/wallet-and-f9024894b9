@@ -2,6 +2,7 @@ package com.fzm.wallet.sdk.repo
 
 import com.fzm.wallet.sdk.api.Apis
 import com.fzm.wallet.sdk.bean.BrowserBean
+import com.fzm.wallet.sdk.bean.Transactions
 import com.fzm.wallet.sdk.bean.toRequestBody
 import com.fzm.wallet.sdk.db.entity.AddCoinTabBean
 import com.fzm.wallet.sdk.db.entity.Coin
@@ -109,6 +110,32 @@ class WalletRepository constructor(private val apis: Apis) {
                     "cointype" to cointype,
                     "tokensymbol" to tokensymbol,
                     "transaction" to transaction
+                )
+            )
+        }
+    }
+    suspend fun queryTransactionsByaddress(
+        cointype: String,
+        tokensymbol: String,
+        address: String,
+        contractAddress: String,
+        index: Long,
+        count: Long,
+        direction: Long,
+        type: Long,
+    ): HttpResult<List<Transactions>> {
+
+        return goCall {
+            apis.queryTransactionsByaddress(
+                toRequestBody(
+                    "Wallet.CreateRawTransaction",
+                    "cointype" to cointype,
+                    "address" to address,
+                    "contractAddr" to contractAddress,
+                    "index" to index,
+                    "count" to count,
+                    "direction" to direction,
+                    "type" to type,
                 )
             )
         }
