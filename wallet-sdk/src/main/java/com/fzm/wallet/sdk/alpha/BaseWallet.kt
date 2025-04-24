@@ -468,7 +468,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 coin.platform = "bty"
             }
 
-            if (coin.contractAddress.isEmpty()) {
+            if (coin.contractAddress.isNullOrEmpty()) {
                 // 处理 GoWallet 同步调用
                 val jsonData = GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
                 val response = gson.fromJson(jsonData, TransactionResponse::class.java)
