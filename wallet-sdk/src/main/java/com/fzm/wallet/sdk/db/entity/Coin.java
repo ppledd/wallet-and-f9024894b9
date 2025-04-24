@@ -58,7 +58,7 @@ public class Coin extends BaseBean implements Comparable<Coin> {
     private int sort;
 
     public String getContractAddress() {
-        return TextUtils.isEmpty(contractAddress) ? "" : "contractAddress";
+        return TextUtils.isEmpty(contractAddress) ? "" : contractAddress;
     }
 
     public void setContractAddress(String contractAddress) {
