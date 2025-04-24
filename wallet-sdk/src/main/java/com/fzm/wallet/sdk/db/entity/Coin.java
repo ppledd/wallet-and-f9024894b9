@@ -15,7 +15,7 @@ import walletapi.Walletapi;
  * Created by ZX on 2018/5/30.
  */
 
-public class Coin extends BaseBean implements Comparable<Coin> {
+public class Coin extends BaseBean implements Comparable<Coin>{
 
     public static final int STATUS_ENABLE = 1;
     public static final int STATUS_DISABLE = -1;
@@ -58,7 +58,7 @@ public class Coin extends BaseBean implements Comparable<Coin> {
     private int sort;
 
     public String getContractAddress() {
-        return TextUtils.isEmpty(contractAddress) ? "" : contractAddress;
+        return contractAddress;
     }
 
     public void setContractAddress(String contractAddress) {
@@ -264,10 +264,9 @@ public class Coin extends BaseBean implements Comparable<Coin> {
     }
 
     public GoWallet.Companion.CoinToken getNewChain() {
-        GoWallet.Companion.CoinToken coinToken = GoWallet.Companion.newCoinType(chain, name, platform, treaty);
+        GoWallet.Companion.CoinToken coinToken = GoWallet.Companion.newCoinType(chain, name, platform,treaty);
         return coinToken;
     }
-
     @Override
     public int compareTo(Coin o) {
         int l = sort - o.getSort();
