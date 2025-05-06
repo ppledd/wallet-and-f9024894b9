@@ -178,7 +178,20 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         // 构造交易
 
 
-        if (coin.contractAddress.isNotEmpty()) {
+        if (coin.contractAddress.isNullOrEmpty()) {
+            val rawTx = GoWallet.createTran(
+                coinToken.cointype,
+                coin.address,
+                toAddress,
+                amount,
+                fee,
+                note ?: "",
+                tokenSymbol
+            )
+            val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
+            val createRawResult: String = stringResult.result ?: ""
+            return signAndSends(coin, tokenSymbol, coinToken, privateKey, createRawResult)
+        } else {
             val result = walletRepository.createByContract(
                 coinToken.cointype,
                 tokenSymbol,
@@ -193,19 +206,6 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 val createJson = gson.toJson(createResult)
                 return signAndSends(coin, tokenSymbol, coinToken, privateKey, createJson)
             }
-        } else {
-            val rawTx = GoWallet.createTran(
-                coinToken.cointype,
-                coin.address,
-                toAddress,
-                amount,
-                fee,
-                note ?: "",
-                tokenSymbol
-            )
-            val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
-            val createRawResult: String = stringResult.result ?: ""
-            return signAndSends(coin, tokenSymbol, coinToken, privateKey, createRawResult)
         }
         return ""
 
@@ -357,7 +357,13 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             for (coin in coins) {
                 deferred.add(async(Dispatchers.IO) {
                     try {
-                        if (coin.contractAddress.isNotEmpty()) {
+                        if (coin.contractAddress.isNullOrEmpty()) {
+                            coin.balance = GoWallet.handleBalance(coin)
+                            updateLocalCoin(
+                                ContentValues().apply { put("balance", coin.balance) },
+                                coin.id
+                            )
+                        } else {
                             val result = walletRepository.getBalanceByContract(
                                 coin.chain,
                                 coin.address,
@@ -370,12 +376,6 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                     coin.id
                                 )
                             }
-                        } else {
-                            coin.balance = GoWallet.handleBalance(coin)
-                            updateLocalCoin(
-                                ContentValues().apply { put("balance", coin.balance) },
-                                coin.id
-                            )
                         }
                         return@async
                     } catch (e: Exception) {
@@ -470,7 +470,8 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
 
             if (coin.contractAddress.isNullOrEmpty()) {
                 // 处理 GoWallet 同步调用
-                val jsonData = GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
+                val jsonData =
+                    GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
                 val response = gson.fromJson(jsonData, TransactionResponse::class.java)
                 response.result ?: emptyList()
             } else {
