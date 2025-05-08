@@ -641,7 +641,8 @@ class GoWallet {
         internal suspend fun createWallet(wallet: PWallet, coinList: List<Coin>): PWallet {
             return withContext(Dispatchers.IO) {
                 coinList.forEachIndexed { index, coin ->
-                    val goChain = if (coin.chain == "BNB") "ETH" else coin.chain
+                    val goChain =
+                        if (coin.chain == "BNB" || coin.chain == "CCC" || coin.chain == "WW") "ETH" else coin.chain
                     val hdWallet = getHDWallet(goChain, wallet.mnem)
                     val pubkey = hdWallet!!.newKeyPub(0)
                     val address = hdWallet.newAddress_v2(0)
@@ -707,8 +708,13 @@ class GoWallet {
                     coinToken.tokenSymbol = "$platform.$name"
                     coinToken.exer = "user.p.$platform.token"
                 } else if (treaty == "2") {
+                    coinToken.priCoinType = if (cointype == "ETH") {
+                        cointype
+                    } else {
+                        Walletapi.TypeBtyString
+                    }
                     coinToken.cointype = Walletapi.TypeBtyString
-                    coinToken.tokenSymbol = "$platform.coins"
+                    coinToken.tokenSymbol = "$name.coins"
                     coinToken.exer = "user.p.$platform.coins"
                 }
             }
@@ -731,6 +737,7 @@ class GoWallet {
             //是否要代扣,默认不代扣
             var proxy: Boolean = false
             var exer: String = ""
+            var priCoinType: String = ""
         }
 
 

@@ -168,43 +168,69 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     private suspend fun handleTransfer(
         coin: Coin,
         toAddress: String,
-        amount: Double,
-        fee: Double,
+        cAmount: Double,
+        cFee: Double,
         note: String?,
         privateKey: String,
     ): String {
         val coinToken = coin.newChain
-        val tokenSymbol = coinToken.tokenSymbol
+        val tsy = coinToken.tokenSymbol
         // 构造交易
-
-
         if (coin.contractAddress.isNullOrEmpty()) {
-            val rawTx = GoWallet.createTran(
-                coinToken.cointype,
-                coin.address,
-                toAddress,
-                amount,
-                fee,
-                note ?: "",
-                tokenSymbol
-            )
-            val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
-            val createRawResult: String = stringResult.result ?: ""
-            return signAndSends(coin, tokenSymbol, coinToken, privateKey, createRawResult)
+            //如果需要代扣
+            if (coinToken.proxy) {
+                val gsendTx = GsendTx().apply {
+                    feepriv = privateKey
+                    to = toAddress
+                    tokenSymbol = coin.name
+                    execer = coinToken.exer
+                    amount = cAmount
+                    txpriv = privateKey
+                    //消耗的BTY
+                    fee = 0.01
+                    //扣的手续费接收地址
+                    //tokenFeeAddr = YBF_FEE_ADDR
+                    //扣多少手续费
+                    //tokenFee = if (it.platform == IPConfig.YBF_CHAIN) YBF_TOKEN_FEE else TOKEN_FEE
+                    coinsForFee = false
+
+                    //feeAddressID是收比特元的手续费地址格式，txAddressID是当前用户地址格式
+                    feeAddressID = if (coin.address.startsWith("0x")) 2 else 0
+                    txAddressID = if (coin.address.startsWith("0x")) 2 else 0
+                }
+                val gsendTxResp = Walletapi.coinsTxGroup(gsendTx)
+                GoWallet.sendTran(coin.chain, gsendTxResp.signedTx, coin.name)
+                return gsendTxResp.txId
+            } else {
+                val rawTx = GoWallet.createTran(
+                    coinToken.cointype,
+                    coin.address,
+                    toAddress,
+                    cAmount,
+                    cFee,
+                    note ?: "",
+                    tsy
+                )
+                val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
+                val createRawResult: String = stringResult.result ?: ""
+                return signAndSends(coin, tsy, coinToken, privateKey, createRawResult)
+            }
+
+
         } else {
             val result = walletRepository.createByContract(
                 coinToken.cointype,
-                tokenSymbol,
+                tsy,
                 coin.address,
                 toAddress,
-                amount,
-                fee,
+                cAmount,
+                cFee,
                 coin.contractAddress
             )
             if (result.isSucceed()) {
                 val createResult = result.data()
                 val createJson = gson.toJson(createResult)
-                return signAndSends(coin, tokenSymbol, coinToken, privateKey, createJson)
+                return signAndSends(coin, tsy, coinToken, privateKey, createJson)
             }
         }
         return ""
