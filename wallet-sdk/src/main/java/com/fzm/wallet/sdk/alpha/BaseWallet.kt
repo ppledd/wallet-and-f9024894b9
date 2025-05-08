@@ -488,16 +488,18 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         size: Long
     ): List<Transactions> {
         return withContext(Dispatchers.IO) {
-            var coinName = coin.name
-            if (coin.name == "BTY" && coin.chain == "ETH") {
-                coin.chain = "BTY"
-                coin.platform = "bty"
-            }
-
             if (coin.contractAddress.isNullOrEmpty()) {
                 // 处理 GoWallet 同步调用
+                val coinToken = coin.newChain
                 val jsonData =
-                    GoWallet.getTranList(coin.address, coin.chain, coinName, type, index, size)
+                    GoWallet.getTranList(
+                        coin.address,
+                        coinToken.cointype,
+                        coinToken.tokenSymbol,
+                        type,
+                        index,
+                        size
+                    )
                 val response = gson.fromJson(jsonData, TransactionResponse::class.java)
                 response.result ?: emptyList()
             } else {
