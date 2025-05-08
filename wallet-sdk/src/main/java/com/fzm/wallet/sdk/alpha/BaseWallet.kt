@@ -182,7 +182,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 val gsendTx = GsendTx().apply {
                     feepriv = privateKey
                     to = toAddress
-                    tokenSymbol = coin.name
+                    tokenSymbol = tsy
                     execer = coinToken.exer
                     amount = cAmount
                     txpriv = privateKey
@@ -199,7 +199,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                     txAddressID = if (coin.address.startsWith("0x")) 2 else 0
                 }
                 val gsendTxResp = Walletapi.coinsTxGroup(gsendTx)
-                GoWallet.sendTran(coin.chain, gsendTxResp.signedTx, coin.name)
+                GoWallet.sendTran(coinToken.cointype, gsendTxResp.signedTx, tsy)
                 return gsendTxResp.txId
             } else {
                 val rawTx = GoWallet.createTran(
