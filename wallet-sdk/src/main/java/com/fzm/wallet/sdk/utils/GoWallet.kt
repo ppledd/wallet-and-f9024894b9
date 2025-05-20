@@ -27,6 +27,7 @@ class GoWallet {
         private val util = Util()
 
         private var lastRefreshSessionTime: Long = 0L
+        const val PARA = "WW"
 
         fun getUtil(goNoderUrl: String): Util {
             util.node = goNoderUrl
@@ -422,9 +423,12 @@ class GoWallet {
         }
 
         //unSignData只有dapp签名（16进制）的时候才是hexTobyte，普通转账是stringTobyte
-        fun signTran(chain: String, unSignData: ByteArray, priv: String, addressId: Int): String? {
+        fun signTran(chain: String, unSignData: ByteArray, priv: String, addressId: Int,chainID: Int = -1): String? {
             try {
                 val signData = SignData()
+                if (chainID != -1) {
+                    signData.chainID = chainID
+                }
                 signData.cointype = chain
                 signData.data = unSignData
                 signData.privKey = priv
@@ -642,7 +646,7 @@ class GoWallet {
             return withContext(Dispatchers.IO) {
                 coinList.forEachIndexed { index, coin ->
                     val goChain =
-                        if (coin.chain == "BNB" || coin.chain == "CCC" || coin.chain == "WW") "ETH" else coin.chain
+                        if (coin.chain == "BNB" || coin.chain == "CCC" || coin.chain == PARA) "ETH" else coin.chain
                     val hdWallet = getHDWallet(goChain, wallet.mnem)
                     val pubkey = hdWallet!!.newKeyPub(0)
                     val address = hdWallet.newAddress_v2(0)
@@ -676,7 +680,8 @@ class GoWallet {
             cointype: String,
             name: String,
             platform: String?,
-            treaty: String?
+            treaty: String?,
+            contractAddress: String?
         ): CoinToken {
             val coinToken = CoinToken()
             coinToken.cointype = cointype
@@ -704,8 +709,8 @@ class GoWallet {
             if (isETHPara(cointype, platform) || isBTYPara(cointype, platform)) {
                 coinToken.proxy = true
                 if (treaty == "1") {
-                    coinToken.cointype = Walletapi.TypeBtyString
-                    coinToken.tokenSymbol = "$platform.$name"
+                    coinToken.cointype = PARA
+                    coinToken.tokenSymbol = "$PARA.$contractAddress"
                     coinToken.exer = "user.p.$platform.token"
                 } else if (treaty == "2") {
                     coinToken.priCoinType = if (cointype == "ETH") {

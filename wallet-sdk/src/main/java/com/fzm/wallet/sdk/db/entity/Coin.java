@@ -40,7 +40,7 @@ public class Coin extends BaseBean implements Comparable<Coin>{
     private String icon;
     private String name;
     //合约地址
-    private String contractAddress;
+    private String contract_address;
     private String nickname;
     private String platform;
     private String chain;
@@ -57,12 +57,12 @@ public class Coin extends BaseBean implements Comparable<Coin>{
     private String netId;
     private int sort;
 
-    public String getContractAddress() {
-        return contractAddress;
+    public String getContract_address() {
+        return contract_address;
     }
 
-    public void setContractAddress(String contractAddress) {
-        this.contractAddress = contractAddress;
+    public void setContract_address(String contract_address) {
+        this.contract_address = contract_address;
     }
 
     public int getSort() {
@@ -264,7 +264,7 @@ public class Coin extends BaseBean implements Comparable<Coin>{
     }
 
     public GoWallet.Companion.CoinToken getNewChain() {
-        GoWallet.Companion.CoinToken coinToken = GoWallet.Companion.newCoinType(chain, name, platform,treaty);
+        GoWallet.Companion.CoinToken coinToken = GoWallet.Companion.newCoinType(chain, name, platform,treaty,contract_address);
         return coinToken;
     }
     @Override
