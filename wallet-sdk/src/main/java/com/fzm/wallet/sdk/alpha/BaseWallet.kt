@@ -436,6 +436,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                         this.treaty = meta.treaty
                         this.netId = meta.netId
                         this.optionalName = meta.optionalName
+                        this.contract_address = meta.contract_address
                         updateLocalCoin(
                             ContentValues().apply {
                                 put("rmb", rmb)
@@ -444,6 +445,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                 put("treaty", treaty)
                                 put("netId", netId)
                                 put("optionalName", optionalName)
+                                put("contract_address", contract_address)
                             },
                             id
                         )
