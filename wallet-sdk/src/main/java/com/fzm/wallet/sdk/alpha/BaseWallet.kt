@@ -395,7 +395,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             for (coin in coins) {
                 deferred.add(async(Dispatchers.IO) {
                     try {
-                        if (coin.contract_address.isNullOrEmpty()) {
+                        if (coin.contract_address.isNullOrEmpty() || coin.platform == "wwchain") {
                             coin.balance = GoWallet.handleBalance(coin)
                             updateLocalCoin(
                                 ContentValues().apply { put("balance", coin.balance) },
