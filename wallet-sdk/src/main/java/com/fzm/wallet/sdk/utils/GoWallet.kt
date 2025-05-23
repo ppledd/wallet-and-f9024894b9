@@ -713,11 +713,6 @@ class GoWallet {
                     coinToken.tokenSymbol = "$PARA.$contractAddress"
                     coinToken.exer = "user.p.$platform.token"
                 } else if (treaty == "2") {
-                    coinToken.priCoinType = if (cointype == "ETH") {
-                        cointype
-                    } else {
-                        Walletapi.TypeBtyString
-                    }
                     coinToken.cointype = Walletapi.TypeBtyString
                     coinToken.tokenSymbol = "$name.coins"
                     coinToken.exer = "user.p.$platform.coins"
@@ -742,7 +737,6 @@ class GoWallet {
             //是否要代扣,默认不代扣
             var proxy: Boolean = false
             var exer: String = ""
-            var priCoinType: String = ""
         }
 
 
