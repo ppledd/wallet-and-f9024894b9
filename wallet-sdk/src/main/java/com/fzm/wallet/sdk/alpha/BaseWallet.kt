@@ -502,7 +502,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
         size: Long
     ): List<Transactions> {
         return withContext(Dispatchers.IO) {
-            if (coin.contract_address.isNullOrEmpty()) {
+            if (coin.contract_address.isNullOrEmpty() || coin.platform == "wwchain") {
                 // 处理 GoWallet 同步调用
                 val coinToken = coin.newChain
                 val jsonData =
