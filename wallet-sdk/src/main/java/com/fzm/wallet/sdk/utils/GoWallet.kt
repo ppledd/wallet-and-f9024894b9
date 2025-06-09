@@ -656,7 +656,9 @@ class GoWallet {
                     coin.pubkey = pubkeyStr
                     coin.address = address
                 }
-                saveAll(coinList)
+                for (coinItem in coinList){
+                    coinItem.save()
+                }
                 wallet.coinList.addAll(coinList)
                 if (MnemonicManager.DEFAULT_STORE == MnemonicManager.store) {
                     // 如果是默认实现，则保存到wallet数据库中
