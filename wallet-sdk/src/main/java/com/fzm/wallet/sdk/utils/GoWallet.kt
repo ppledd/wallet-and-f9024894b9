@@ -634,7 +634,7 @@ class GoWallet {
         fun imortMulAddress(appId: String, appSymbol: String, mulAddress: String): Boolean? {
             checkSessionID()
             val mulAddr = WalletMulAddr()
-            mulAddr.util = getUtil(UrlConfig.GO_URL!!)
+            mulAddr.util = getUtil(UrlConfig.GO_URL)
             mulAddr.appid = appId
             mulAddr.appSymbol = appSymbol
             mulAddr.mulAddr = mulAddress
