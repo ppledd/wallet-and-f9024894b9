@@ -646,7 +646,7 @@ class GoWallet {
             return withContext(Dispatchers.IO) {
                 coinList.forEachIndexed { index, coin ->
                     val goChain =
-                        if (coin.chain == "BNB" || coin.chain == "CCC" || coin.chain == PARA) "ETH" else coin.chain
+                        if (coin.chain == "BNB" || coin.chain == "CCC" || coin.chain == PARA || coin.chain == "POL") "ETH" else coin.chain
                     val hdWallet = getHDWallet(goChain, wallet.mnem)
                     val pubkey = hdWallet!!.newKeyPub(0)
                     val address = hdWallet.newAddress_v2(0)
