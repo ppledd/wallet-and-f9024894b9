@@ -111,7 +111,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 throw Exception("密码输入错误")
             }
             val mnem = MnemonicManager.getMnemonicWords(password)
-            val privateKey = coin.getPrivkey(if (coin.chain == "BNB") "ETH" else coin.chain, mnem)
+            val privateKey = coin.getPrivkey(if (coin.chain == "BNB" || coin.chain == "POL") "ETH" else coin.chain, mnem)
                 ?: throw Exception("私钥获取失败")
             handleTransfer(coin, toAddress, amount, fee, note, privateKey)
         }
