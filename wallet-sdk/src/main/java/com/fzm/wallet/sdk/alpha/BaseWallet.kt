@@ -203,18 +203,53 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 GoWallet.sendTran(coinToken.cointype, gsendTxResp.signedTx, tsy)
                 return gsendTxResp.txId
             } else {
-                val rawTx = GoWallet.createTran(
-                    coinToken.cointype,
-                    coin.address,
-                    toAddress,
-                    cAmount,
-                    cFee,
-                    note ?: "",
-                    tsy
-                )
-                val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
-                val createRawResult: String = stringResult.result ?: ""
-                return signAndSends(coinToken.cointype, tsy, createRawResult,coinToken.cointype,-1,coin.address,privateKey)
+                if (coin.name == "POL") {
+                    val result = walletRepository.createByContract(
+                        coinToken.cointype,
+                        tsy,
+                        coin.address,
+                        toAddress,
+                        cAmount,
+                        cFee,
+                        coin.contract_address
+                    )
+                    if (result.isSucceed()) {
+                        val createResult = result.data()
+                        val createJson = gson.toJson(createResult)
+                            return signAndSends(
+                                coinToken.cointype,
+                                tsy,
+                                createJson,
+                                coinToken.cointype,
+                                137,
+                                coin.address,
+                                privateKey
+                            )
+                    }
+                } else {
+                    val rawTx = GoWallet.createTran(
+                        coinToken.cointype,
+                        coin.address,
+                        toAddress,
+                        cAmount,
+                        cFee,
+                        note ?: "",
+                        tsy
+                    )
+                    val stringResult = JSON.parseObject(rawTx, StringResult::class.java)
+                    val createRawResult: String = stringResult.result ?: ""
+                    return signAndSends(
+                        coinToken.cointype,
+                        tsy,
+                        createRawResult,
+                        coinToken.cointype,
+                        -1,
+                        coin.address,
+                        privateKey
+                    )
+                }
+
+
             }
 
 
@@ -231,10 +266,26 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
             if (result.isSucceed()) {
                 val createResult = result.data()
                 val createJson = gson.toJson(createResult)
-                if(coin.platform == "wwchain") {
-                    return signAndSends(coin.chain, tsy, createJson,PARA,5188,coin.address, privateKey)
-                }else {
-                    return signAndSends(coinToken.cointype, tsy, createJson, coinToken.cointype,-1,coin.address,privateKey)
+                if (coin.platform == "wwchain") {
+                    return signAndSends(
+                        coin.chain,
+                        tsy,
+                        createJson,
+                        PARA,
+                        5188,
+                        coin.address,
+                        privateKey
+                    )
+                } else {
+                    return signAndSends(
+                        coinToken.cointype,
+                        tsy,
+                        createJson,
+                        coinToken.cointype,
+                        -1,
+                        coin.address,
+                        privateKey
+                    )
                 }
             }
         }
@@ -242,26 +293,26 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
 
     }
 
-//    coin: Coin,
+    //    coin: Coin,
 //    tokenSymbol: String,
 //    coinToken: GoWallet.Companion.CoinToken,
 //    privateKey: String,
 //    createRawResult: String,
 //    chainId:Int = -1,
     private fun signAndSends(
-        coinType:String,
+        coinType: String,
         tokenSymbol: String,
         createRawResult: String,
-        sendChain:String,
-        chainId:Int,
-        address:String,
-        privateKey:String
+        sendChain: String,
+        chainId: Int,
+        address: String,
+        privateKey: String
     ): String {
 
         //签名交易
         addressId = if (address.startsWith("0x")) 2 else 0
         val signTx = GoWallet.signTran(
-            coinType, Walletapi.stringTobyte(createRawResult), privateKey, addressId,chainId
+            coinType, Walletapi.stringTobyte(createRawResult), privateKey, addressId, chainId
         ) ?: throw Exception("签名交易失败")
 
         // 发送交易
