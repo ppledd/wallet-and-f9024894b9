@@ -217,7 +217,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                         val createResult = result.data()
                         val createJson = gson.toJson(createResult)
                             return signAndSends(
-                                "POL",
+                                "ETH",
                                 tsy,
                                 createJson,
                                 coinToken.cointype,
