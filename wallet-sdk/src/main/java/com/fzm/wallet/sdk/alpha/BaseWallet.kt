@@ -203,7 +203,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 GoWallet.sendTran(coinToken.cointype, gsendTxResp.signedTx, tsy)
                 return gsendTxResp.txId
             } else {
-                if (coin.name == "POL") {
+                if (coin.chain == "POL") {
                     val result = walletRepository.createByContract(
                         coinToken.cointype,
                         tsy,
