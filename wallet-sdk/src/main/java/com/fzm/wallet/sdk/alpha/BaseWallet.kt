@@ -111,7 +111,10 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 throw Exception("密码输入错误")
             }
             val mnem = MnemonicManager.getMnemonicWords(password)
-            val privateKey = coin.getPrivkey(if (coin.chain == "BNB" || coin.chain == "POL") "ETH" else coin.chain, mnem)
+            val privateKey = coin.getPrivkey(
+                if (coin.chain == "BNB" || coin.chain == "POL") "ETH" else coin.chain,
+                mnem
+            )
                 ?: throw Exception("私钥获取失败")
             handleTransfer(coin, toAddress, amount, fee, note, privateKey)
         }
@@ -176,56 +179,58 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     ): String {
         val coinToken = coin.newChain
         val tsy = coinToken.tokenSymbol
-        // 构造交易
-        if (coin.contract_address.isNullOrEmpty()) {
-            //如果需要代扣
-            if (coinToken.proxy) {
-                val gsendTx = GsendTx().apply {
-                    feepriv = privateKey
-                    to = toAddress
-                    tokenSymbol = tsy
-                    execer = coinToken.exer
-                    amount = cAmount
-                    txpriv = privateKey
-                    //消耗的BTY
-                    fee = 0.01
-                    //扣的手续费接收地址
-                    //tokenFeeAddr = YBF_FEE_ADDR
-                    //扣多少手续费
-                    //tokenFee = if (it.platform == IPConfig.YBF_CHAIN) YBF_TOKEN_FEE else TOKEN_FEE
-                    coinsForFee = false
 
-                    //feeAddressID是收比特元的手续费地址格式，txAddressID是当前用户地址格式
-                    feeAddressID = if (coin.address.startsWith("0x")) 2 else 0
-                    txAddressID = if (coin.address.startsWith("0x")) 2 else 0
-                }
-                val gsendTxResp = Walletapi.coinsTxGroup(gsendTx)
-                GoWallet.sendTran(coinToken.cointype, gsendTxResp.signedTx, tsy)
-                return gsendTxResp.txId
-            } else {
-                if (coin.chain == "POL") {
-                    val result = walletRepository.createByContract(
-                        coinToken.cointype,
-                        tsy,
-                        coin.address,
-                        toAddress,
-                        cAmount,
-                        cFee,
-                        coin.contract_address
-                    )
-                    if (result.isSucceed()) {
-                        val createResult = result.data()
-                        val createJson = gson.toJson(createResult)
-                            return signAndSends(
-                                "ETH",
-                                tsy,
-                                createJson,
-                                coinToken.cointype,
-                                137,
-                                coin.address,
-                                privateKey
-                            )
+
+        if (coin.chain == "POL") {
+            val result = walletRepository.createByContract(
+                coinToken.cointype,
+                tsy,
+                coin.address,
+                toAddress,
+                cAmount,
+                cFee,
+                coin.contract_address
+            )
+            if (result.isSucceed()) {
+                val createResult = result.data()
+                val createJson = gson.toJson(createResult)
+                return signAndSends(
+                    "ETH",
+                    tsy,
+                    createJson,
+                    coinToken.cointype,
+                    137,
+                    coin.address,
+                    privateKey
+                )
+            }
+        } else {
+            // 构造交易
+            if (coin.contract_address.isNullOrEmpty()) {
+                //如果需要代扣
+                if (coinToken.proxy) {
+                    val gsendTx = GsendTx().apply {
+                        feepriv = privateKey
+                        to = toAddress
+                        tokenSymbol = tsy
+                        execer = coinToken.exer
+                        amount = cAmount
+                        txpriv = privateKey
+                        //消耗的BTY
+                        fee = 0.01
+                        //扣的手续费接收地址
+                        //tokenFeeAddr = YBF_FEE_ADDR
+                        //扣多少手续费
+                        //tokenFee = if (it.platform == IPConfig.YBF_CHAIN) YBF_TOKEN_FEE else TOKEN_FEE
+                        coinsForFee = false
+
+                        //feeAddressID是收比特元的手续费地址格式，txAddressID是当前用户地址格式
+                        feeAddressID = if (coin.address.startsWith("0x")) 2 else 0
+                        txAddressID = if (coin.address.startsWith("0x")) 2 else 0
                     }
+                    val gsendTxResp = Walletapi.coinsTxGroup(gsendTx)
+                    GoWallet.sendTran(coinToken.cointype, gsendTxResp.signedTx, tsy)
+                    return gsendTxResp.txId
                 } else {
                     val rawTx = GoWallet.createTran(
                         coinToken.cointype,
@@ -247,48 +252,51 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                         coin.address,
                         privateKey
                     )
+
+
                 }
 
 
-            }
-
-
-        } else {
-            val result = walletRepository.createByContract(
-                coinToken.cointype,
-                tsy,
-                coin.address,
-                toAddress,
-                cAmount,
-                cFee,
-                coin.contract_address
-            )
-            if (result.isSucceed()) {
-                val createResult = result.data()
-                val createJson = gson.toJson(createResult)
-                if (coin.platform == "wwchain") {
-                    return signAndSends(
-                        coin.chain,
-                        tsy,
-                        createJson,
-                        PARA,
-                        5188,
-                        coin.address,
-                        privateKey
-                    )
-                } else {
-                    return signAndSends(
-                        coinToken.cointype,
-                        tsy,
-                        createJson,
-                        coinToken.cointype,
-                        -1,
-                        coin.address,
-                        privateKey
-                    )
+            } else {
+                val result = walletRepository.createByContract(
+                    coinToken.cointype,
+                    tsy,
+                    coin.address,
+                    toAddress,
+                    cAmount,
+                    cFee,
+                    coin.contract_address
+                )
+                if (result.isSucceed()) {
+                    val createResult = result.data()
+                    val createJson = gson.toJson(createResult)
+                    if (coin.platform == "wwchain") {
+                        return signAndSends(
+                            coin.chain,
+                            tsy,
+                            createJson,
+                            PARA,
+                            5188,
+                            coin.address,
+                            privateKey
+                        )
+                    } else {
+                        return signAndSends(
+                            coinToken.cointype,
+                            tsy,
+                            createJson,
+                            coinToken.cointype,
+                            -1,
+                            coin.address,
+                            privateKey
+                        )
+                    }
                 }
             }
         }
+
+
+
         return ""
 
     }
