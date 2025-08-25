@@ -96,6 +96,9 @@ interface Apis {
 
     @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
     @POST("/")
+    suspend fun getBalanceBySymbol(@Body body: RequestBody): GoResponse<ContractBalance>
+    @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
+    @POST("/")
     suspend fun getBalanceByContract(@Body body: RequestBody): GoResponse<ContractBalance>
     @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
     @POST("/")

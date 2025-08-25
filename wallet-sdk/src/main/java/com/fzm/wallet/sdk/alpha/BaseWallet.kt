@@ -461,18 +461,36 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                 coin.id
                             )
                         } else {
-                            val result = walletRepository.getBalanceByContract(
-                                coin.chain,
-                                coin.address,
-                                coin.contract_address
-                            )
-                            if (result.isSucceed()) {
-                                coin.balance = result.data()?.balance
-                                updateLocalCoin(
-                                    ContentValues().apply { put("balance", coin.balance) },
-                                    coin.id
+                            if(coin.name == "DDWL"){
+                                val result = walletRepository.getBalanceBySymbol(
+                                    "BTY",
+                                    coin.address,
+                                    coin.contract_address
                                 )
+                                if (result.isSucceed()) {
+                                    coin.balance = result.data()?.balance
+                                    updateLocalCoin(
+                                        ContentValues().apply { put("balance", coin.balance) },
+                                        coin.id
+                                    )
+                                }
+                            }else {
+                                val result = walletRepository.getBalanceByContract(
+                                    coin.chain,
+                                    coin.address,
+                                    coin.contract_address
+                                )
+                                if (result.isSucceed()) {
+                                    coin.balance = result.data()?.balance
+                                    updateLocalCoin(
+                                        ContentValues().apply { put("balance", coin.balance) },
+                                        coin.id
+                                    )
+                                }
                             }
+
+
+
                         }
                         return@async
                     } catch (e: Exception) {

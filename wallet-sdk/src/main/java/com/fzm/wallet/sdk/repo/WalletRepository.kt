@@ -84,6 +84,22 @@ class WalletRepository constructor(private val apis: Apis) {
             )
         }
     }
+    suspend fun getBalanceBySymbol(
+        cointype: String,
+        address: String,
+        tokensymbol: String
+    ): HttpResult<ContractBalance> {
+        return goCall {
+            apis.getBalanceBySymbol(
+                toRequestBody(
+                    "Wallet.GetBalance",
+                    "cointype" to cointype,
+                    "address" to address,
+                    "tokensymbol" to tokensymbol
+                )
+            )
+        }
+    }
 
     suspend fun createByContract(
         cointype: String,
