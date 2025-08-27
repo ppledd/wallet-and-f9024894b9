@@ -471,8 +471,10 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                 coin.id
                             )
                         } else {
+
+                            if(coin.platform == "btyerc"){
                                 val result = walletRepository.getBalanceByContract(
-                                    coin.newChain.cointype,
+                                    "BTY",
                                     coin.address,
                                     coin.contract_address
                                 )
@@ -483,6 +485,22 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                         coin.id
                                     )
                                 }
+                            }else {
+                                val result = walletRepository.getBalanceByContract(
+                                    coin.chain,
+                                    coin.address,
+                                    coin.contract_address
+                                )
+                                if (result.isSucceed()) {
+                                    coin.balance = result.data()?.balance
+                                    updateLocalCoin(
+                                        ContentValues().apply { put("balance", coin.balance) },
+                                        coin.id
+                                    )
+                                }
+                            }
+
+
 
 
 
