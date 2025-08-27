@@ -473,7 +473,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                         } else {
 
                             if(coin.platform == "btyerc"){
-                                val result = walletRepository.getBalanceByContract(
+                                val result = walletRepository.getBalanceBySymbol(
                                     "BTY",
                                     coin.address,
                                     coin.contract_address
