@@ -716,7 +716,7 @@ class GoWallet {
                     coinToken.exer = "user.p.$platform.token"
                 } else if (treaty == "2") {
                     coinToken.cointype = Walletapi.TypeBtyString
-                    coinToken.tokenSymbol = "$name.coins"
+                    coinToken.tokenSymbol = if(platform == "wwchain") "$name.coins" else "$name"
                     coinToken.exer = "user.p.$platform.coins"
                 }
             }

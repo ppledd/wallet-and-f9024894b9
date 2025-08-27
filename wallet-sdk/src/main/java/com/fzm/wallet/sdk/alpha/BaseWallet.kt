@@ -461,22 +461,8 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                 coin.id
                             )
                         } else {
-                            if(coin.name == "DDWL"){
-                                val result = walletRepository.getBalanceBySymbol(
-                                    "BTY",
-                                    coin.address,
-                                    coin.contract_address
-                                )
-                                if (result.isSucceed()) {
-                                    coin.balance = result.data()?.balance
-                                    updateLocalCoin(
-                                        ContentValues().apply { put("balance", coin.balance) },
-                                        coin.id
-                                    )
-                                }
-                            }else {
                                 val result = walletRepository.getBalanceByContract(
-                                    coin.chain,
+                                    coin.newChain.cointype,
                                     coin.address,
                                     coin.contract_address
                                 )
@@ -487,7 +473,6 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                         coin.id
                                     )
                                 }
-                            }
 
 
 
