@@ -280,6 +280,16 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                             coin.address,
                             privateKey
                         )
+                    } else if(coin.platform == "btyerc") {
+                        return signAndSends(
+                            coin.chain,
+                            tsy,
+                            createJson,
+                            coinToken.cointype,
+                            2999,
+                            coin.address,
+                            privateKey
+                        )
                     } else {
                         return signAndSends(
                             coinToken.cointype,

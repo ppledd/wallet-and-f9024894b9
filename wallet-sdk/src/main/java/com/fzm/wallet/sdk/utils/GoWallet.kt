@@ -423,7 +423,13 @@ class GoWallet {
         }
 
         //unSignData只有dapp签名（16进制）的时候才是hexTobyte，普通转账是stringTobyte
-        fun signTran(chain: String, unSignData: ByteArray, priv: String, addressId: Int,chainID: Int = -1): String? {
+        fun signTran(
+            chain: String,
+            unSignData: ByteArray,
+            priv: String,
+            addressId: Int,
+            chainID: Int = -1
+        ): String? {
             try {
                 val signData = SignData()
                 if (chainID != -1) {
@@ -656,7 +662,7 @@ class GoWallet {
                     coin.pubkey = pubkeyStr
                     coin.address = address
                 }
-                for (coinItem in coinList){
+                for (coinItem in coinList) {
                     coinItem.save()
                 }
                 wallet.coinList.addAll(coinList)
@@ -716,7 +722,7 @@ class GoWallet {
                     coinToken.exer = "user.p.$platform.token"
                 } else if (treaty == "2") {
                     coinToken.cointype = Walletapi.TypeBtyString
-                    coinToken.tokenSymbol = if(platform == "wwchain") "$name.coins" else "$name"
+                    coinToken.tokenSymbol = if (platform == "btyerc") "$name" else "$name.coins"
                     coinToken.exer = "user.p.$platform.coins"
                 }
             }
