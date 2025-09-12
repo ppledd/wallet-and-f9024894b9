@@ -608,8 +608,9 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 response.result ?: emptyList()
             } else {
                 // 处理 Repository 异步调用
+                val chain = if(coin.platform == "btyerc") "BTY" else  coin.chain
                 val res = walletRepository.queryTransactionsByaddress(
-                    coin.chain, "", coin.address, coin.contract_address, index, size, 0, type
+                    chain, "", coin.address, coin.contract_address, index, size, 0, type
                 )
                 if (res.isSucceed()) {
                     res.data() ?: emptyList()
