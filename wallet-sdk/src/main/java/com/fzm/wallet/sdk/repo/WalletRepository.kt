@@ -144,7 +144,7 @@ class WalletRepository constructor(private val apis: Apis) {
         return goCall {
             apis.queryTransactionsByaddress(
                 toRequestBody(
-                    "Wallet.CreateRawTransaction",
+                    "Wallet.QueryTransactionsByaddress",
                     "cointype" to cointype,
                     "address" to address,
                     "contractAddr" to contractAddress,
