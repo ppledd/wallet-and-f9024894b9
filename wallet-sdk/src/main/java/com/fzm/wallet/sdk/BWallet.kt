@@ -37,7 +37,17 @@ interface BWallet {
      * @param appKey        appKey，用于验证平台
      * @param device        设备，用于钱包网关后端
      */
-    fun init(context: Context, module: Module?, platformId: String, appSymbol: String, appId: String, appKey: String, device: String)
+    fun init(
+        context: Context,
+        module: Module?,
+        platformId: String,
+        appSymbol: String,
+        appId: String,
+        appKey: String,
+        device: String,
+        baseUrl: String,
+        goUrl: String
+    )
 
     /**
      * 切换钱包
@@ -131,7 +141,14 @@ interface BWallet {
      * @param password  钱包密码
      */
     @Throws(Exception::class)
-    suspend fun transfer(coin: Coin, toAddress: String, amount: Double, fee: Double, note: String?, password: String): String
+    suspend fun transfer(
+        coin: Coin,
+        toAddress: String,
+        amount: Double,
+        fee: Double,
+        note: String?,
+        password: String
+    ): String
 
     /**
      * 获取资产余额列表
@@ -141,8 +158,10 @@ interface BWallet {
      * @param requireQuotation  是否查询市场行情
      * @param predicate         币种过滤
      */
-    fun getCoinBalance(initialDelay: Long, period: Long, requireQuotation: Boolean,
-                       predicate: ((Coin) -> Boolean)? = null): Flow<List<Coin>>
+    fun getCoinBalance(
+        initialDelay: Long, period: Long, requireQuotation: Boolean,
+        predicate: ((Coin) -> Boolean)? = null
+    ): Flow<List<Coin>>
 
     /**
      * 获取单个币种的资产余额与行情
@@ -160,7 +179,12 @@ interface BWallet {
      * @param index     查询索引
      * @param size      查询数量
      */
-    suspend fun getTransactionList(coin: Coin, type: Long, index: Long, size: Long): List<Transactions>
+    suspend fun getTransactionList(
+        coin: Coin,
+        type: Long,
+        index: Long,
+        size: Long
+    ): List<Transactions>
 
     /**
      * 通过hash查询交易
@@ -170,7 +194,7 @@ interface BWallet {
      * @param hash          交易hash
      */
     @Throws(Exception::class)
-    suspend fun getTransactionByHash(chain: String, tokenSymbol: String, hash: String): Transactions
+    suspend fun getTransactionByHash(coin: Coin, hash: String): Transactions
 
     /**
      * 根据主链获取地址
@@ -210,7 +234,13 @@ interface BWallet {
      * @param chain     主链
      * @param platform  平台码
      */
-    suspend fun searchCoins(page: Int, limit: Int, keywords: String, chain: String, platform: String): List<Coin>
+    suspend fun searchCoins(
+        page: Int,
+        limit: Int,
+        keywords: String,
+        chain: String,
+        platform: String
+    ): List<Coin>
 
     /**
      * 修改币种排序
@@ -250,6 +280,6 @@ interface BWallet {
      * 获取临时私钥
      */
 
-     fun getBtyPrikey(): String?
+    fun getBtyPrikey(): String?
 
 }

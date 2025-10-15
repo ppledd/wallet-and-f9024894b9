@@ -60,7 +60,9 @@ internal class BWalletImpl : BWallet {
         appSymbol: String,
         appId: String,
         appKey: String,
-        device: String
+        device: String,
+        baseUrl:String,
+        goUrl:String
     ) {
         FZM_PLATFORM_ID = platformId
         GoWallet.setSessionInfo(WalletSession().apply {
@@ -72,7 +74,7 @@ internal class BWalletImpl : BWallet {
             GoWallet.checkSessionID()
         }
         Walletapi.setAppKey(appKey)
-        module?.walletNetModule()
+        module?.walletNetModule(baseUrl,goUrl)
         val user = MMkvUtil.decodeString(CURRENT_USER, "")
         val id = MMkvUtil.decodeString("${user}${PWallet.PWALLET_ID}", "").ifEmpty {
             MMkvUtil.decodeLong(PWallet.PWALLET_ID).toString()
@@ -247,11 +249,10 @@ internal class BWalletImpl : BWallet {
     }
 
     override suspend fun getTransactionByHash(
-        chain: String,
-        tokenSymbol: String,
+        coin: Coin,
         hash: String
     ): Transactions {
-        return wallet.getTransactionByHash(chain, tokenSymbol, hash)
+        return wallet.getTransactionByHash(coin, hash)
     }
 
     override suspend fun getAddress(chain: String): String {

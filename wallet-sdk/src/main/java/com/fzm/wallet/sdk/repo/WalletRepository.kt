@@ -156,6 +156,25 @@ class WalletRepository constructor(private val apis: Apis) {
             )
         }
     }
+    suspend fun queryTransactionByTxId(
+        cointype: String,
+        tokensymbol: String,
+        contractAddress: String,
+        txid: String
+    ): HttpResult<Transactions> {
+
+        return goCall {
+            apis.queryTransactionByTxId(
+                toRequestBody(
+                    "Wallet.QueryTransactionByTxid",
+                    "cointype" to cointype,
+                    "tokensymbol" to tokensymbol,
+                    "contractAddr" to contractAddress,
+                    "txid" to txid,
+                )
+            )
+        }
+    }
 
     suspend fun getGasPrice(): HttpResult<String> {
 

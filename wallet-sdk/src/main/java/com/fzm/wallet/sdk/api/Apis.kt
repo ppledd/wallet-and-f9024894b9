@@ -106,4 +106,7 @@ interface Apis {
     @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
     @POST("/")
     suspend fun queryTransactionsByaddress(@Body body: RequestBody): GoResponse<List<Transactions>>
+    @Headers("$DOMAIN_NAME_HEADER$DOMAIN_URL_GO")
+    @POST("/")
+    suspend fun queryTransactionByTxId(@Body body: RequestBody): GoResponse<Transactions>
 }

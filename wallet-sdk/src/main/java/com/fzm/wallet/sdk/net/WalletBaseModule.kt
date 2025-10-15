@@ -33,9 +33,10 @@ val rootScope: Scope
 
 val walletQualifier = _q(BWallet)
 
-val walletBaseModules = module { walletNetModule() }
+fun Module.walletNetModule(baseUrl: String, goUrl: String) {
 
-fun Module.walletNetModule() {
+    UrlConfig.BASE_URL = baseUrl
+    UrlConfig.GO_URL = goUrl
 
     single<OkHttpClient>(walletQualifier) {
 
@@ -119,8 +120,8 @@ object UrlConfig {
 
     private val config: Properties by lazy { openAssets() }
 
-    val BASE_URL: String by lazy { config.getProperty("BASE_URL") }
-    val GO_URL: String by lazy { config.getProperty("GO_URL") }
+    var BASE_URL: String? = null
+    var GO_URL: String? = null
     val EXCHANGE_MANAGER: String by lazy { config.getProperty("EXCHANGE_MANAGER") }
     val EXCHANGE_DO: String by lazy { config.getProperty("EXCHANGE_DO") }
     val EXCHANGE_TOKEN: String by lazy { config.getProperty("EXCHANGE_TOKEN") }

@@ -280,7 +280,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                             coin.address,
                             privateKey
                         )
-                    } else if(coin.platform == "btyerc") {
+                    } else if (coin.platform == "btyerc") {
                         return signAndSends(
                             coin.chain,
                             tsy,
@@ -472,7 +472,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                             )
                         } else {
 
-                            if(coin.platform == "btyerc"){
+                            if (coin.platform == "btyerc") {
                                 val result = walletRepository.getBalanceBySymbol(
                                     "BTY",
                                     coin.address,
@@ -485,7 +485,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                         coin.id
                                     )
                                 }
-                            }else {
+                            } else {
                                 val result = walletRepository.getBalanceByContract(
                                     coin.chain,
                                     coin.address,
@@ -499,9 +499,6 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                                     )
                                 }
                             }
-
-
-
 
 
                         }
@@ -608,7 +605,7 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
                 response.result ?: emptyList()
             } else {
                 // 处理 Repository 异步调用
-                val chain = if(coin.platform == "btyerc") "BTY" else  coin.chain
+                val chain = if (coin.platform == "btyerc") "BTY" else coin.chain
                 val res = walletRepository.queryTransactionsByaddress(
                     chain, "", coin.address, coin.contract_address, index, size, 0, type
                 )
@@ -622,22 +619,24 @@ abstract class BaseWallet(protected val wallet: PWallet) : Wallet<Coin> {
     }
 
     override suspend fun getTransactionByHash(
-        chain: String,
-        tokenSymbol: String,
+        coin: Coin,
         hash: String
     ): Transactions {
         return withContext(Dispatchers.IO) {
-            val data = GoWallet.getTranByTxid(chain, tokenSymbol, hash)
-            if (data.isNullOrEmpty()) throw Exception("查询数据为空")
-            val response = gson.fromJson<GoResponse<Transactions>>(
-                data,
-                object : TypeToken<GoResponse<Transactions>>() {}.type
+            val chain = if (coin.platform == "btyerc") "BTY" else coin.chain
+            val coinToken = coin.newChain
+            val res = walletRepository.queryTransactionByTxId(
+                chain,
+                coinToken.tokenSymbol,
+                coin.contract_address,
+                hash
             )
-            if (response.error == null) {
-                response.result ?: throw Exception("查询结果为空")
+            if (res.isSucceed()) {
+                res.data() ?: throw Exception("查询结果为空")
             } else {
-                throw Exception(response.error)
+                throw Exception("${res.error()}")
             }
+
         }
     }
 
