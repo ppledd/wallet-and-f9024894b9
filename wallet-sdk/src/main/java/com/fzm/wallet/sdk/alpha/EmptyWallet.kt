@@ -71,9 +71,7 @@ object EmptyWallet : Wallet<Coin> {
     }
 
     override suspend fun getTransactionByHash(
-        chain: String,
-        tokenSymbol: String,
-        hash: String
+        coin: Coin, hash: String
     ): Transactions {
         return Transactions()
     }

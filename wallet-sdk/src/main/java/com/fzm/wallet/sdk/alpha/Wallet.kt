@@ -110,7 +110,7 @@ interface Wallet<T> : Cloneable {
      * @param hash          交易hash
      */
     @Throws(Exception::class)
-    suspend fun getTransactionByHash( coin: Coin, hash: String): Transactions
+    suspend fun getTransactionByHash(coin: Coin, hash: String): Transactions
 
     /**
      * 根据主链获取地址
