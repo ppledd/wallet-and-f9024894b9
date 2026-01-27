@@ -15,6 +15,8 @@ public class PWallet extends BaseBean implements Cloneable {
     public static final int TYPE_NONE = 6;
     private int type;
     private String user;
+    private String phone;
+    private String email;
     private String name;
     private String password;
     private String mnem;
@@ -25,6 +27,22 @@ public class PWallet extends BaseBean implements Cloneable {
 
     public boolean isPutpassword() {
         return putpassword;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPutpassword(boolean putpassword) {
